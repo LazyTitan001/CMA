@@ -14,7 +14,6 @@ exports.createCar = async (req, res) => {
 
         const uploadResults = await Promise.all(uploadPromises);
         
-        // Clean up local files after upload
         for (const file of req.files) {
             await fs.unlink(file.path);
         }
@@ -97,12 +96,10 @@ exports.updateCar = async (req, res) => {
 
         if (req.files && req.files.length > 0) {
             if (removeImages === 'true') {
-                // Delete existing images from Cloudinary
                 for (const image of car.images) {
                     await cloudinary.uploader.destroy(image.public_id);
                 }
 
-                // Upload new images
                 const uploadPromises = req.files.map(file =>
                     cloudinary.uploader.upload(file.path, {
                         folder: 'cars'
@@ -115,12 +112,10 @@ exports.updateCar = async (req, res) => {
                     public_id: result.public_id
                 }));
 
-                // Clean up local files
                 for (const file of req.files) {
                     await fs.unlink(file.path);
                 }
             } else {
-                // Add new images
                 const uploadPromises = req.files.map(file =>
                     cloudinary.uploader.upload(file.path, {
                         folder: 'cars'
@@ -135,7 +130,6 @@ exports.updateCar = async (req, res) => {
 
                 car.images = [...car.images, ...newImages];
 
-                // Clean up local files
                 for (const file of req.files) {
                     await fs.unlink(file.path);
                 }
@@ -161,12 +155,12 @@ exports.deleteCar = async (req, res) => {
             return ApiResponse.error(res, 'Car not found', 404);
         }
 
-        // Delete images from Cloudinary
+
         for (const image of car.images) {
             await cloudinary.uploader.destroy(image.public_id);
         }
 
-        await car.deleteOne(); // Using deleteOne instead of remove
+        await car.deleteOne(); 
         ApiResponse.success(res, null, 'Car deleted successfully');
     } catch (error) {
         ApiResponse.error(res, error.message, 500);

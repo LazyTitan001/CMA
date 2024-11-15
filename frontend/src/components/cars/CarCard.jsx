@@ -9,7 +9,7 @@ const CarCard = ({ car, onDelete }) => {
       <CardMedia
         component="img"
         height="200"
-        image={car.images[0]?.url} // Updated to use Cloudinary URL
+        image={car.images[0]?.url}
         alt={car.title}
         sx={{ objectFit: 'cover' }}
       />

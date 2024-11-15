@@ -81,7 +81,6 @@ const EditCar = () => {
       return
     }
 
-    // Validate file types and sizes
     const validFiles = files.filter(file => {
       const isValidType = file.type.startsWith('image/')
       const isValidSize = file.size <= 5 * 1024 * 1024 // 5MB limit
@@ -92,7 +91,6 @@ const EditCar = () => {
 
     setNewImages((prev) => [...prev, ...validFiles])
 
-    // Create preview URLs
     const newPreviews = validFiles.map(file => URL.createObjectURL(file))
     setNewImagePreviews((prev) => [...prev, ...newPreviews])
   }
@@ -222,7 +220,7 @@ const EditCar = () => {
               <Grid item xs={6} sm={4} md={3} key={index}>
                 <Box sx={{ position: 'relative' }}>
                   <img
-                    src={image.url} // Updated to use Cloudinary URL
+                    src={image.url} 
                     alt={`Car ${index}`}
                     style={{
                       width: '100%',

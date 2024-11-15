@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 const api = axios.create({
-  baseURL: 'http://localhost:5000/api',
+  baseURL: 'https://cma-xtq1.onrender.com/api',
 })
 
 api.interceptors.request.use((config) => {
@@ -12,7 +12,6 @@ api.interceptors.request.use((config) => {
   return config
 })
 
-// These endpoints don't need changes as they don't handle images
 export const login = async (credentials) => {
   const response = await api.post('/auth/login', credentials)
   return response.data
@@ -33,7 +32,6 @@ export const getCar = async (id) => {
   return response.data
 }
 
-// For file uploads, we need to ensure proper headers
 export const createCar = async (carData) => {
   const config = {
     headers: {

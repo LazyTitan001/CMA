@@ -2,7 +2,7 @@ import React from 'react';
 import { AppBar, Toolbar, Typography, Button, Box, Menu, MenuItem, Container } from '@mui/material';
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import '@fontsource/poppins';  // Importing Poppins font
+import '@fontsource/poppins'; 
 
 const Navbar = () => {
   const navigate = useNavigate();
