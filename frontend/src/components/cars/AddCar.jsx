@@ -82,7 +82,7 @@ const AddCar = () => {
       toast.error('Please select at least one image')
       return
     }
-
+  
     setLoading(true)
     try {
       const formDataToSend = new FormData()
@@ -92,7 +92,7 @@ const AddCar = () => {
       images.forEach((image) => {
         formDataToSend.append('images', image)
       })
-
+  
       await createCar(formDataToSend)
       toast.success('Car added successfully!')
       navigate('/')

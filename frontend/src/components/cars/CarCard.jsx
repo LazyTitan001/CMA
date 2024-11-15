@@ -1,7 +1,6 @@
 import { Card, CardMedia, CardContent, CardActions, Typography, Button, Chip, Box } from '@mui/material'
 import { Edit, Delete, Visibility } from '@mui/icons-material'
 import { useNavigate } from 'react-router-dom'
-
 const CarCard = ({ car, onDelete }) => {
   const navigate = useNavigate()
 
@@ -10,7 +9,7 @@ const CarCard = ({ car, onDelete }) => {
       <CardMedia
         component="img"
         height="200"
-        image={`http://localhost:5000/uploads/${car.images[0]}`}
+        image={car.images[0]?.url} // Updated to use Cloudinary URL
         alt={car.title}
         sx={{ objectFit: 'cover' }}
       />

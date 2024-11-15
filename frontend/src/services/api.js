@@ -12,6 +12,7 @@ api.interceptors.request.use((config) => {
   return config
 })
 
+// These endpoints don't need changes as they don't handle images
 export const login = async (credentials) => {
   const response = await api.post('/auth/login', credentials)
   return response.data
@@ -32,13 +33,24 @@ export const getCar = async (id) => {
   return response.data
 }
 
+// For file uploads, we need to ensure proper headers
 export const createCar = async (carData) => {
-  const response = await api.post('/cars', carData)
+  const config = {
+    headers: {
+      'Content-Type': 'multipart/form-data'
+    }
+  }
+  const response = await api.post('/cars', carData, config)
   return response.data
 }
 
 export const updateCar = async (id, carData) => {
-  const response = await api.patch(`/cars/${id}`, carData)
+  const config = {
+    headers: {
+      'Content-Type': 'multipart/form-data'
+    }
+  }
+  const response = await api.patch(`/cars/${id}`, carData, config)
   return response.data
 }
 

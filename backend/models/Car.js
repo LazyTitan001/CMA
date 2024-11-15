@@ -11,8 +11,8 @@ const carSchema = new mongoose.Schema({
         required: true
     },
     images: [{
-        type: String,
-        required: true
+        url: String,
+        public_id: String
     }],
     tags: {
         car_type: String,

@@ -57,8 +57,23 @@ const CarDetail = () => {
     )
   }
 
+  if (!car) {
+    return (
+      <Box sx={{ textAlign: 'center', mt: 4 }}>
+        <Typography variant="h6">Car not found</Typography>
+        <Button
+          startIcon={<ArrowBack />}
+          onClick={() => navigate('/')}
+          sx={{ mt: 2 }}
+        >
+          Back to List
+        </Button>
+      </Box>
+    )
+  }
+
   return (
-    <Box>
+    <Box sx={{ maxWidth: 1200, margin: '0 auto', padding: 3 }}>
       <Button
         startIcon={<ArrowBack />}
         onClick={() => navigate('/')}
@@ -69,7 +84,9 @@ const CarDetail = () => {
 
       <Paper elevation={3} sx={{ p: 3 }}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 3 }}>
-          <Typography variant="h4">{car.title}</Typography>
+          <Typography variant="h4" sx={{ fontWeight: 500 }}>
+            {car.title}
+          </Typography>
           <Box>
             <Button
               startIcon={<Edit />}
@@ -90,58 +107,156 @@ const CarDetail = () => {
 
         <Grid container spacing={3}>
           <Grid item xs={12} md={8}>
-            <img
-              src={`http://localhost:5000/uploads/${car.images[0]}`}
-              alt={car.title}
-              style={{
-                width: '100%',
-                height: '400px',
-                objectFit: 'cover',
-                borderRadius: '8px',
-                cursor: 'pointer',
+            <Box
+              sx={{
+                position: 'relative',
+                borderRadius: 2,
+                overflow: 'hidden',
+                '&:hover': {
+                  '& .zoom-indicator': {
+                    opacity: 1,
+                  }
+                }
               }}
-              onClick={() => setSelectedImage(car.images[0])}
-            />
+            >
+              <img
+                src={car.images[0]?.url}
+                alt={car.title}
+                style={{
+                  width: '100%',
+                  height: '500px',
+                  objectFit: 'cover',
+                  cursor: 'pointer',
+                }}
+                onClick={() => setSelectedImage(car.images[0])}
+              />
+              <Box
+                className="zoom-indicator"
+                sx={{
+                  position: 'absolute',
+                  bottom: 16,
+                  left: '50%',
+                  transform: 'translateX(-50%)',
+                  backgroundColor: 'rgba(0, 0, 0, 0.7)',
+                  color: 'white',
+                  padding: '8px 16px',
+                  borderRadius: 1,
+                  opacity: 0,
+                  transition: 'opacity 0.2s',
+                }}
+              >
+                <Typography variant="body2">
+                  Click to zoom
+                </Typography>
+              </Box>
+            </Box>
+            
             <Grid container spacing={1} sx={{ mt: 2 }}>
               {car.images.slice(1).map((image, index) => (
                 <Grid item xs={3} key={index}>
-                  <img
-                    src={`http://localhost:5000/uploads/${image}`}
-                    alt={`${car.title} ${index + 2}`}
-                    style={{
-                      width: '100%',
-                      height: '100px',
-                      objectFit: 'cover',
-                      borderRadius: '4px',
-                      cursor: 'pointer',
+                  <Box
+                    sx={{
+                      position: 'relative',
+                      borderRadius: 1,
+                      overflow: 'hidden',
+                      '&:hover': {
+                        '& .image-overlay': {
+                          opacity: 1,
+                        }
+                      }
                     }}
-                    onClick={() => setSelectedImage(image)}
-                  />
+                  >
+                    <img
+                      src={image.url}
+                      alt={`${car.title} ${index + 2}`}
+                      style={{
+                        width: '100%',
+                        height: '100px',
+                        objectFit: 'cover',
+                        cursor: 'pointer',
+                      }}
+                      onClick={() => setSelectedImage(image)}
+                    />
+                    <Box
+                      className="image-overlay"
+                      sx={{
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        backgroundColor: 'rgba(0, 0, 0, 0.3)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        opacity: 0,
+                        transition: 'opacity 0.2s',
+                      }}
+                    >
+                      <Typography
+                        variant="body2"
+                        sx={{ color: 'white', fontWeight: 500 }}
+                      >
+                        View
+                      </Typography>
+                    </Box>
+                  </Box>
                 </Grid>
               ))}
             </Grid>
           </Grid>
 
           <Grid item xs={12} md={4}>
-            <Typography variant="h6" gutterBottom>
-              Details
-            </Typography>
-            <Box sx={{ mb: 2 }}>
-              <Typography variant="body1" sx={{ fontWeight: 'bold', mb: 1 }}>
-                Tags:
+            <Paper
+              elevation={2}
+              sx={{
+                p: 3,
+                height: '100%',
+                backgroundColor: 'rgba(0, 0, 0, 0.02)',
+              }}
+            >
+              <Typography variant="h6" gutterBottom>
+                Details
               </Typography>
-              <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-                <Chip label={`Type: ${car.tags.car_type}`} />
-                <Chip label={`Company: ${car.tags.company}`} />
-                <Chip label={`Dealer: ${car.tags.dealer}`} />
+              
+              <Box sx={{ mb: 3 }}>
+                <Typography
+                  variant="subtitle2"
+                  sx={{ color: 'text.secondary', mb: 1 }}
+                >
+                  Tags
+                </Typography>
+                <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+                  <Chip
+                    label={`Type: ${car.tags.car_type}`}
+                    size="small"
+                    sx={{ borderRadius: 1 }}
+                  />
+                  <Chip
+                    label={`Company: ${car.tags.company}`}
+                    size="small"
+                    sx={{ borderRadius: 1 }}
+                  />
+                  <Chip
+                    label={`Dealer: ${car.tags.dealer}`}
+                    size="small"
+                    sx={{ borderRadius: 1 }}
+                  />
+                </Box>
               </Box>
-            </Box>
-            <Typography variant="body1" sx={{ fontWeight: 'bold', mb: 1 }}>
-              Description:
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
-              {car.description}
-            </Typography>
+
+              <Box>
+                <Typography
+                  variant="subtitle2"
+                  sx={{ color: 'text.secondary', mb: 1 }}
+                >
+                  Description
+                </Typography>
+                <Typography variant="body2" sx={{ lineHeight: 1.6 }}>
+                  {car.description}
+                </Typography>
+              </Box>
+            </Paper>
           </Grid>
         </Grid>
       </Paper>
@@ -150,15 +265,22 @@ const CarDetail = () => {
         open={!!selectedImage}
         onClose={() => setSelectedImage(null)}
         maxWidth="lg"
+        PaperProps={{
+          sx: {
+            backgroundColor: 'transparent',
+            boxShadow: 'none',
+          }
+        }}
       >
         <img
-          src={`http://localhost:5000/uploads/${selectedImage}`}
+          src={selectedImage?.url}
           alt="Large view"
           style={{
-            maxWidth: '100vw',
+            maxWidth: '90vw',
             maxHeight: '90vh',
             objectFit: 'contain',
           }}
+          onClick={() => setSelectedImage(null)}
         />
       </Dialog>
     </Box>

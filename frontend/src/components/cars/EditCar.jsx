@@ -75,7 +75,7 @@ const EditCar = () => {
   const handleImageChange = (e) => {
     const files = Array.from(e.target.files)
     const totalImages = files.length + existingImages.length + newImages.length
-    
+
     if (totalImages > 10) {
       toast.error('Maximum 10 images allowed')
       return
@@ -91,7 +91,7 @@ const EditCar = () => {
     })
 
     setNewImages((prev) => [...prev, ...validFiles])
-    
+
     // Create preview URLs
     const newPreviews = validFiles.map(file => URL.createObjectURL(file))
     setNewImagePreviews((prev) => [...prev, ...newPreviews])
@@ -175,7 +175,7 @@ const EditCar = () => {
           multiline
           rows={4}
         />
-        
+
         {/* Tags Section */}
         <Box sx={{ mt: 3 }}>
           <Typography variant="subtitle1" gutterBottom>
@@ -222,7 +222,7 @@ const EditCar = () => {
               <Grid item xs={6} sm={4} md={3} key={index}>
                 <Box sx={{ position: 'relative' }}>
                   <img
-                    src={`http://localhost:5000/uploads/${image}`}
+                    src={image.url} // Updated to use Cloudinary URL
                     alt={`Car ${index}`}
                     style={{
                       width: '100%',
@@ -263,8 +263,8 @@ const EditCar = () => {
             style={{ display: 'none' }}
           />
           <label htmlFor="image-upload">
-            <Button 
-              variant="outlined" 
+            <Button
+              variant="outlined"
               component="span"
               disabled={existingImages.length + newImages.length >= 10}
             >

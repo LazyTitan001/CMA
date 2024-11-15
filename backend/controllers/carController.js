@@ -1,19 +1,28 @@
 const Car = require('../models/Car');
 const ApiResponse = require('../utils/apiResponse');
+const cloudinary = require('../config/cloudinary');
 const fs = require('fs').promises;
-const path = require('path');
 
 exports.createCar = async (req, res) => {
     try {
         const { title, description, tags } = req.body;
-        const images = req.files.map(file => file.filename);
+        const uploadPromises = req.files.map(file => 
+            cloudinary.uploader.upload(file.path, {
+                folder: 'cars'
+            })
+        );
 
-        if (images.length > 10) {
-            for (let i = 10; i < images.length; i++) {
-                await fs.unlink(path.join('uploads', images[i]));
-            }
-            images.length = 10;
+        const uploadResults = await Promise.all(uploadPromises);
+        
+        // Clean up local files after upload
+        for (const file of req.files) {
+            await fs.unlink(file.path);
         }
+
+        const images = uploadResults.map(result => ({
+            url: result.secure_url,
+            public_id: result.public_id
+        }));
 
         const car = new Car({
             title,
@@ -63,6 +72,7 @@ exports.getCarById = async (req, res) => {
     }
 };
 
+
 exports.updateCar = async (req, res) => {
     try {
         const { title, description, tags, removeImages } = req.body;
@@ -87,16 +97,48 @@ exports.updateCar = async (req, res) => {
 
         if (req.files && req.files.length > 0) {
             if (removeImages === 'true') {
+                // Delete existing images from Cloudinary
                 for (const image of car.images) {
-                    try {
-                        await fs.unlink(path.join('uploads', image));
-                    } catch (error) {
-                        console.error('Error deleting image:', error);
-                    }
+                    await cloudinary.uploader.destroy(image.public_id);
                 }
-                car.images = req.files.map(file => file.filename);
+
+                // Upload new images
+                const uploadPromises = req.files.map(file =>
+                    cloudinary.uploader.upload(file.path, {
+                        folder: 'cars'
+                    })
+                );
+
+                const uploadResults = await Promise.all(uploadPromises);
+                car.images = uploadResults.map(result => ({
+                    url: result.secure_url,
+                    public_id: result.public_id
+                }));
+
+                // Clean up local files
+                for (const file of req.files) {
+                    await fs.unlink(file.path);
+                }
             } else {
-                car.images = [...car.images, ...req.files.map(file => file.filename)];
+                // Add new images
+                const uploadPromises = req.files.map(file =>
+                    cloudinary.uploader.upload(file.path, {
+                        folder: 'cars'
+                    })
+                );
+
+                const uploadResults = await Promise.all(uploadPromises);
+                const newImages = uploadResults.map(result => ({
+                    url: result.secure_url,
+                    public_id: result.public_id
+                }));
+
+                car.images = [...car.images, ...newImages];
+
+                // Clean up local files
+                for (const file of req.files) {
+                    await fs.unlink(file.path);
+                }
             }
         }
 
@@ -119,15 +161,12 @@ exports.deleteCar = async (req, res) => {
             return ApiResponse.error(res, 'Car not found', 404);
         }
 
+        // Delete images from Cloudinary
         for (const image of car.images) {
-            try {
-                await fs.unlink(path.join('uploads', image));
-            } catch (error) {
-                console.error('Error deleting image:', error);
-            }
+            await cloudinary.uploader.destroy(image.public_id);
         }
 
-        await car.remove();
+        await car.deleteOne(); // Using deleteOne instead of remove
         ApiResponse.success(res, null, 'Car deleted successfully');
     } catch (error) {
         ApiResponse.error(res, error.message, 500);
