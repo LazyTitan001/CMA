@@ -118,6 +118,7 @@ const CarDetail = () => {
                   }
                 }
               }}
+              onClick={() => setSelectedImage(car.images[0])}
             >
               <img
                 src={car.images[0]?.url}
@@ -128,7 +129,6 @@ const CarDetail = () => {
                   objectFit: 'cover',
                   cursor: 'pointer',
                 }}
-                onClick={() => setSelectedImage(car.images[0])}
               />
               <Box
                 className="zoom-indicator"
@@ -163,8 +163,10 @@ const CarDetail = () => {
                         '& .image-overlay': {
                           opacity: 1,
                         }
-                      }
+                      },
+                      cursor: 'pointer',
                     }}
+                    onClick={() => setSelectedImage(image)}
                   >
                     <img
                       src={image.url}
@@ -173,9 +175,7 @@ const CarDetail = () => {
                         width: '100%',
                         height: '100px',
                         objectFit: 'cover',
-                        cursor: 'pointer',
                       }}
-                      onClick={() => setSelectedImage(image)}
                     />
                     <Box
                       className="image-overlay"
@@ -264,24 +264,35 @@ const CarDetail = () => {
       <Dialog
         open={!!selectedImage}
         onClose={() => setSelectedImage(null)}
-        maxWidth="lg"
+        maxWidth={false}
         PaperProps={{
           sx: {
             backgroundColor: 'transparent',
             boxShadow: 'none',
+            margin: 1,
           }
         }}
       >
-        <img
-          src={selectedImage?.url}
-          alt="Large view"
-          style={{
-            maxWidth: '90vw',
-            maxHeight: '90vh',
-            objectFit: 'contain',
+        <Box
+          sx={{
+            position: 'relative',
+            backgroundColor: 'rgba(0, 0, 0, 0.9)',
+            padding: 2,
+            cursor: 'pointer',
           }}
           onClick={() => setSelectedImage(null)}
-        />
+        >
+          <img
+            src={selectedImage?.url}
+            alt="Large view"
+            style={{
+              maxWidth: '90vw',
+              maxHeight: '90vh',
+              objectFit: 'contain',
+              display: 'block',
+            }}
+          />
+        </Box>
       </Dialog>
     </Box>
   )
