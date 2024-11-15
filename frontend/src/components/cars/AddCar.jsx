@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import '@fontsource/poppins';
 import { useNavigate } from 'react-router-dom'
 import {
   Box,
@@ -8,13 +9,21 @@ import {
   Typography,
   Grid,
   IconButton,
+  Container,
+  Fade,
+  useTheme,
 } from '@mui/material'
-import { Delete as DeleteIcon } from '@mui/icons-material'
+import {
+  Delete as DeleteIcon,
+  AddAPhoto as AddPhotoIcon,
+  DirectionsCar as DirectionsCarIcon,
+} from '@mui/icons-material'
 import { toast } from 'react-toastify'
 import { createCar } from '../../services/api'
 
 const AddCar = () => {
   const navigate = useNavigate()
+  const theme = useTheme()
   const [loading, setLoading] = useState(false)
   const [formData, setFormData] = useState({
     title: '',
@@ -55,8 +64,6 @@ const AddCar = () => {
     }
 
     setImages((prev) => [...prev, ...files])
-    
-    // Create preview URLs
     const newPreviewUrls = files.map(file => URL.createObjectURL(file))
     setPreviewUrls((prev) => [...prev, ...newPreviewUrls])
   }
@@ -97,130 +104,195 @@ const AddCar = () => {
   }
 
   return (
-    <Paper elevation={3} sx={{ p: 4, maxWidth: 800, mx: 'auto' }}>
-      <Typography variant="h5" gutterBottom>
-        Add New Car
+    <Container maxWidth="md">
+      <Fade in timeout={1000}>
+        <Paper 
+          elevation={3} 
+          sx={{ 
+            p: 4, 
+            mt: 4, 
+            borderRadius: 2,
+            background: 'rgba(255, 255, 255, 0.98)',
+          }}
+        >
+          <Box sx={{ textAlign: 'center', mb: 4 }}>
+            <DirectionsCarIcon 
+              sx={{ 
+                fontSize: 40, 
+                color: theme.palette.primary.main,
+                mb: 1
+              }} 
+            />
+            <Typography 
+        variant="h4" 
+        sx={{
+          fontWeight: 700,
+          color: theme.palette.primary.main,
+          fontFamily: 'Poppins, sans-serif',
+        }}
+      >
+        ADD NEW CAR
       </Typography>
-      <form onSubmit={handleSubmit}>
-        <TextField
-          fullWidth
-          label="Title"
-          name="title"
-          value={formData.title}
-          onChange={handleChange}
-          margin="normal"
-          required
-        />
-        <TextField
-          fullWidth
-          label="Description"
-          name="description"
-          value={formData.description}
-          onChange={handleChange}
-          margin="normal"
-          multiline
-          rows={4}
-          required
-        />
-        <Grid container spacing={2} sx={{ mt: 1 }}>
-          <Grid item xs={12} sm={4}>
-            <TextField
-              fullWidth
-              label="Car Type"
-              name="tags.car_type"
-              value={formData.tags.car_type}
-              onChange={handleChange}
-              required
-            />
-          </Grid>
-          <Grid item xs={12} sm={4}>
-            <TextField
-              fullWidth
-              label="Company"
-              name="tags.company"
-              value={formData.tags.company}
-              onChange={handleChange}
-              required
-            />
-          </Grid>
-          <Grid item xs={12} sm={4}>
-            <TextField
-              fullWidth
-              label="Dealer"
-              name="tags.dealer"
-              value={formData.tags.dealer}
-              onChange={handleChange}
-              required
-            />
-          </Grid>
-        </Grid>
+          </Box>
 
-        <Box sx={{ mt: 3 }}>
-          <input
-            accept="image/*"
-            type="file"
-            id="image-upload"
-            multiple
-            onChange={handleImageChange}
-            style={{ display: 'none' }}
-          />
-          <label htmlFor="image-upload">
-            <Button variant="outlined" component="span">
-              Upload Images (Max 10)
-            </Button>
-          </label>
-        </Box>
-
-        <Grid container spacing={2} sx={{ mt: 2 }}>
-          {previewUrls.map((url, index) => (
-            <Grid item xs={6} sm={4} md={3} key={index}>
-              <Box sx={{ position: 'relative' }}>
-                <img
-                  src={url}
-                  alt={`Preview ${index}`}
-                  style={{
-                    width: '100%',
-                    height: '100px',
-                    objectFit: 'cover',
-                    borderRadius: '4px',
-                  }}
+          <form onSubmit={handleSubmit}>
+            <TextField
+              fullWidth
+              label="Car Title"
+              name="title"
+              value={formData.title}
+              onChange={handleChange}
+              margin="normal"
+              required
+              sx={{ mb: 2 }}
+            />
+            <TextField
+              fullWidth
+              label="Car Description"
+              name="description"
+              value={formData.description}
+              onChange={handleChange}
+              margin="normal"
+              multiline
+              rows={4}
+              required
+              sx={{ mb: 3 }}
+            />
+            
+            <Grid container spacing={3}>
+              <Grid item xs={12} sm={4}>
+                <TextField
+                  fullWidth
+                  label="Car Type"
+                  name="tags.car_type"
+                  value={formData.tags.car_type}
+                  onChange={handleChange}
+                  required
                 />
-                <IconButton
-                  size="small"
-                  sx={{
-                    position: 'absolute',
-                    top: 4,
-                    right: 4,
-                    backgroundColor: 'rgba(255, 255, 255, 0.8)',
-                  }}
-                  onClick={() => removeImage(index)}
-                >
-                  <DeleteIcon />
-                </IconButton>
-              </Box>
+              </Grid>
+              <Grid item xs={12} sm={4}>
+                <TextField
+                  fullWidth
+                  label="Company"
+                  name="tags.company"
+                  value={formData.tags.company}
+                  onChange={handleChange}
+                  required
+                />
+              </Grid>
+              <Grid item xs={12} sm={4}>
+                <TextField
+                  fullWidth
+                  label="Dealer"
+                  name="tags.dealer"
+                  value={formData.tags.dealer}
+                  onChange={handleChange}
+                  required
+                />
+              </Grid>
             </Grid>
-          ))}
-        </Grid>
 
-        <Box sx={{ mt: 3, display: 'flex', gap: 2 }}>
-          <Button
-            type="submit"
-            variant="contained"
-            disabled={loading}
-            sx={{ flex: 1 }}
-          >
-            {loading ? 'Adding Car...' : 'Add Car'}
-          </Button>
-          <Button
-            variant="outlined"
-            onClick={() => navigate('/')}
-            sx={{ flex: 1 }}
-          >
-            Cancel
-          </Button>
-        </Box>
-      </form>
-    </Paper>
+            <Box sx={{ mt: 4, textAlign: 'center' }}>
+              <input
+                accept="image/*"
+                type="file"
+                id="image-upload"
+                multiple
+                onChange={handleImageChange}
+                style={{ display: 'none' }}
+              />
+              <label htmlFor="image-upload">
+                <Button 
+                  variant="outlined" 
+                  component="span"
+                  startIcon={<AddPhotoIcon />}
+                  sx={{
+                    px: 4,
+                    py: 1.5,
+                    borderRadius: 2,
+                  }}
+                >
+                  Upload Images (Max 10)
+                </Button>
+              </label>
+            </Box>
+
+            <Grid container spacing={2} sx={{ mt: 3 }}>
+              {previewUrls.map((url, index) => (
+                <Grid item xs={6} sm={4} md={3} key={index}>
+                  <Box 
+                    sx={{ 
+                      position: 'relative',
+                      '&:hover': {
+                        '& .deleteButton': {
+                          opacity: 1,
+                        }
+                      }
+                    }}
+                  >
+                    <img
+                      src={url}
+                      alt={`Preview ${index}`}
+                      style={{
+                        width: '100%',
+                        height: '120px',
+                        objectFit: 'cover',
+                        borderRadius: '8px',
+                        boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+                      }}
+                    />
+                    <IconButton
+                      className="deleteButton"
+                      size="small"
+                      sx={{
+                        position: 'absolute',
+                        top: 8,
+                        right: 8,
+                        backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                        opacity: 0,
+                        transition: 'opacity 0.2s',
+                        '&:hover': {
+                          backgroundColor: 'rgba(255, 255, 255, 1)',
+                        }
+                      }}
+                      onClick={() => removeImage(index)}
+                    >
+                      <DeleteIcon />
+                    </IconButton>
+                  </Box>
+                </Grid>
+              ))}
+            </Grid>
+
+            <Box sx={{ mt: 4, display: 'flex', gap: 2 }}>
+              <Button
+                variant="outlined"
+                onClick={() => navigate('/')}
+                sx={{ 
+                  flex: 1,
+                  py: 1.5,
+                  borderRadius: 2,
+                }}
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                variant="contained"
+                disabled={loading}
+                sx={{ 
+                  flex: 1,
+                  py: 1.5,
+                  borderRadius: 2,
+                }}
+              >
+                {loading ? 'Adding Car...' : 'Add Car'}
+              </Button>
+            </Box>
+          </form>
+        </Paper>
+      </Fade>
+    </Container>
   )
 }
 
