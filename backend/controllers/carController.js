@@ -9,7 +9,6 @@ exports.createCar = async (req, res) => {
         const images = req.files.map(file => file.filename);
 
         if (images.length > 10) {
-            // Delete excess uploaded files
             for (let i = 10; i < images.length; i++) {
                 await fs.unlink(path.join('uploads', images[i]));
             }
@@ -66,7 +65,7 @@ exports.getCarById = async (req, res) => {
 
 exports.updateCar = async (req, res) => {
     try {
-        const { title, description, tags } = req.body;
+        const { title, description, tags, removeImages } = req.body;
         const car = await Car.findOne({
             _id: req.params.id,
             user: req.user._id
@@ -78,24 +77,33 @@ exports.updateCar = async (req, res) => {
 
         if (title) car.title = title;
         if (description) car.description = description;
-        if (tags) car.tags = JSON.parse(tags);
+        if (tags) {
+            try {
+                car.tags = Array.isArray(tags) ? tags : JSON.parse(tags);
+            } catch (error) {
+                return ApiResponse.error(res, 'Invalid tags format', 400);
+            }
+        }
 
         if (req.files && req.files.length > 0) {
-            // Delete old images
-            for (const image of car.images) {
-                try {
-                    await fs.unlink(path.join('uploads', image));
-                } catch (error) {
-                    console.error('Error deleting image:', error);
+            if (removeImages === 'true') {
+                for (const image of car.images) {
+                    try {
+                        await fs.unlink(path.join('uploads', image));
+                    } catch (error) {
+                        console.error('Error deleting image:', error);
+                    }
                 }
+                car.images = req.files.map(file => file.filename);
+            } else {
+                car.images = [...car.images, ...req.files.map(file => file.filename)];
             }
-
-            car.images = req.files.map(file => file.filename);
         }
 
         await car.save();
         ApiResponse.success(res, car, 'Car updated successfully');
     } catch (error) {
+        console.error('Update car error:', error);
         ApiResponse.error(res, error.message, 500);
     }
 };
@@ -111,7 +119,6 @@ exports.deleteCar = async (req, res) => {
             return ApiResponse.error(res, 'Car not found', 404);
         }
 
-        // Delete associated images
         for (const image of car.images) {
             try {
                 await fs.unlink(path.join('uploads', image));
